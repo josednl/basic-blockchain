@@ -45,6 +45,10 @@ export class Blockchain {
       throw new Error('Transaction must include from and to address');
     }
 
+    if (!transaction.isValid()) {
+      throw new Error('Cannot add invalid transaction to chain');
+    }
+
     if (transaction.amount <= 0) {
       throw new Error('Transaction amount should be higher than 0');
     }
@@ -74,6 +78,10 @@ export class Blockchain {
     for (let i = 1; i < this.chain.length; i++) {
       const currentBlock = this.chain[i]!;
       const previousBlock = this.chain[i - 1]!;
+
+      if (!currentBlock.hasValidTransactions()) {
+        return false;
+      }
 
       if (currentBlock.hash !== currentBlock.calculateHash()) {
         return false;
