@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { Transaction } from './transaction';
 
 export class Block {
   public hash: string;
@@ -7,7 +8,7 @@ export class Block {
   constructor(
     public index: number,
     public timestamp: number,
-    public data: any,
+    public transactions: Transaction[],
     public previousHash: string = ''
   ) {
     this.nonce = 0;
@@ -15,7 +16,7 @@ export class Block {
   }
 
   public calculateHash(): string {
-    const dataString = JSON.stringify(this.data);
+    const dataString = JSON.stringify(this.transactions);
     return crypto
       .createHash('sha256')
       .update(this.index + this.previousHash + this.timestamp + dataString + this.nonce)

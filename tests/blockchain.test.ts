@@ -1,5 +1,5 @@
 import { Blockchain } from '../src/blockchain';
-import { Block } from '../src/block';
+import { Transaction } from '../src/transaction';
 
 describe('Blockchain', () => {
   let blockchain: Blockchain;
@@ -10,36 +10,42 @@ describe('Blockchain', () => {
 
   test('should create the genesis block', () => {
     expect(blockchain.chain.length).toBe(1);
-    expect(blockchain.chain[0]!.data).toBe('Genesis Block');
+    expect(blockchain.chain[0]!.transactions).toEqual([]);
   });
 
-  test('should add a new block', () => {
-    const newBlock = new Block(1, Date.now(), { amount: 100 });
-    blockchain.addBlock(newBlock);
+  test('should add a transaction and mine it', () => {
+    const tx = new Transaction('addr1', 'addr2', 50);
+    blockchain.addTransaction(tx);
+    blockchain.minePendingTransactions('miner-addr');
 
     expect(blockchain.chain.length).toBe(2);
-    expect(blockchain.chain[1]!.data).toEqual({ amount: 100 });
-    expect(blockchain.chain[1]!.previousHash).toBe(blockchain.chain[0]!.hash);
+    expect(blockchain.chain[1]!.transactions.length).toBe(2); // tx + reward
+    expect(blockchain.getBalanceOfAddress('addr1')).toBe(-50);
+    expect(blockchain.getBalanceOfAddress('addr2')).toBe(50);
+    expect(blockchain.getBalanceOfAddress('miner-addr')).toBe(100);
+  });
+
+  test('should handle multiple transactions in a block', () => {
+    blockchain.addTransaction(new Transaction('addr1', 'addr2', 50));
+    blockchain.addTransaction(new Transaction('addr2', 'addr1', 20));
+    blockchain.minePendingTransactions('miner-addr');
+
+    expect(blockchain.getBalanceOfAddress('addr1')).toBe(-30);
+    expect(blockchain.getBalanceOfAddress('addr2')).toBe(30);
   });
 
   test('should validate the chain', () => {
-    blockchain.addBlock(new Block(1, Date.now(), { amount: 100 }));
-    blockchain.addBlock(new Block(2, Date.now(), { amount: 200 }));
+    blockchain.addTransaction(new Transaction('addr1', 'addr2', 50));
+    blockchain.minePendingTransactions('miner-addr');
 
     expect(blockchain.isChainValid()).toBe(true);
   });
 
-  test('should mine a block with the given difficulty', () => {
-    const newBlock = new Block(1, Date.now(), { amount: 100 });
-    blockchain.addBlock(newBlock);
+  test('should invalidate the chain if a transaction is tempered', () => {
+    blockchain.addTransaction(new Transaction('addr1', 'addr2', 50));
+    blockchain.minePendingTransactions('miner-addr');
 
-    const target = Array(blockchain.difficulty + 1).join('0');
-    expect(blockchain.chain[1]!.hash.substring(0, blockchain.difficulty)).toBe(target);
-  });
-
-  test('should invalidate the chain if a block is tempered', () => {
-    blockchain.addBlock(new Block(1, Date.now(), { amount: 100 }));
-    blockchain.chain[1]!.data = { amount: 500 };
+    blockchain.chain[1]!.transactions[0]!.amount = 5000;
 
     expect(blockchain.isChainValid()).toBe(false);
   });
