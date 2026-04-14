@@ -29,6 +29,14 @@ describe('Blockchain', () => {
     expect(blockchain.isChainValid()).toBe(true);
   });
 
+  test('should mine a block with the given difficulty', () => {
+    const newBlock = new Block(1, Date.now(), { amount: 100 });
+    blockchain.addBlock(newBlock);
+
+    const target = Array(blockchain.difficulty + 1).join('0');
+    expect(blockchain.chain[1]!.hash.substring(0, blockchain.difficulty)).toBe(target);
+  });
+
   test('should invalidate the chain if a block is tempered', () => {
     blockchain.addBlock(new Block(1, Date.now(), { amount: 100 }));
     blockchain.chain[1]!.data = { amount: 500 };
