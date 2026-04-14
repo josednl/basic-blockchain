@@ -37,6 +37,13 @@ To maintain code quality and prevent broken code from being committed:
   1. TypeScript type checking (`npx tsc --noEmit`).
   2. Unit tests execution (`npx jest`).
 
+## Installed Skills (Contextual Guidance)
+This project uses specialized skills located in `.agents/skills/`. AI agents MUST prioritize the instructions and best practices provided by these skills:
+- **`architecture-patterns`**: Guides the implementation of scalable and clean architecture.
+- **`nodejs-backend-patterns`**: Best practices for Node.js backend development.
+- **`nodejs-best-practices`**: General security and performance guidelines for Node.js.
+- **`typescript-advanced-types`**: Advanced typing patterns for a robust codebase.
+
 ## Guidelines for AI Agents
 - **Never commit broken code**: Always run `npm run precommit` before committing.
 - **Conventional Commits**: Follow the `feat:`, `fix:`, `chore:`, etc., naming convention.
