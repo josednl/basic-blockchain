@@ -15,6 +15,9 @@ export class Block {
     this.hash = this.calculateHash();
   }
 
+  /**
+   * Generates a SHA256 hash of all the block's fields (index, previousHash, timestamp, transactions, and nonce).
+   */
   public calculateHash(): string {
     const dataString = JSON.stringify(this.transactions);
     return crypto
@@ -23,6 +26,10 @@ export class Block {
       .digest('hex');
   }
 
+  /**
+   * Implements Proof-of-Work. It repeatedly changes the nonce and recalculates the hash
+   * until the hash starts with a specific number of leading zeros (difficulty).
+   */
   public mineBlock(difficulty: number): void {
     const target = Array(difficulty + 1).join('0');
     while (this.hash.substring(0, difficulty) !== target) {
@@ -32,6 +39,9 @@ export class Block {
     console.log(`Block mined: ${this.hash}`);
   }
 
+  /**
+   * Validates all the transactions within this block.
+   */
   public hasValidTransactions(): boolean {
     for (const tx of this.transactions) {
       if (!tx.isValid()) {

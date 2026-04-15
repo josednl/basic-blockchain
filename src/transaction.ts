@@ -10,6 +10,10 @@ export class Transaction {
     public amount: number
   ) {}
 
+  /**
+   * Returns the SHA256 hash of the transaction.
+   * This hash is what will be signed by the private key.
+   */
   public calculateHash(): string {
     return require('crypto')
       .createHash('sha256')
@@ -17,6 +21,10 @@ export class Transaction {
       .digest('hex');
   }
 
+  /**
+   * Signs a transaction with the given signingKey (which contains the public/private key pair).
+   * It first checks if the public key matches the fromAddress of the transaction.
+   */
   public signTransaction(signingKey: EC.KeyPair): void {
     if (signingKey.getPublic('hex') !== this.fromAddress) {
       throw new Error('You cannot sign transactions for other wallets!');
@@ -27,8 +35,13 @@ export class Transaction {
     this.signature = sig.toDER('hex');
   }
 
+  /**
+   * Checks if the signature is valid (transaction has not been tampered with).
+   * It uses the fromAddress as the public key.
+   */
   public isValid(): boolean {
-    if (this.fromAddress === null) return true; // Mining reward
+    // If the transaction is from the null address, it's a mining reward and considered valid
+    if (this.fromAddress === null) return true;
 
     if (!this.signature || this.signature.length === 0) {
       throw new Error('No signature in this transaction');
