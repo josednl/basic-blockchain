@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Blockchain } from '../blockchain';
+import { Transaction } from '../transaction';
 
 export class BlockchainController {
   constructor(private blockchain: Blockchain) {}
@@ -36,13 +37,20 @@ export class BlockchainController {
   };
 
   public addTransaction = (req: Request, res: Response) => {
-    // This is a simplified version. Usually, we'd receive a signed transaction.
-    // For this basic API, we'll assume the client sends the transaction details
-    // and we'll need a way to validate it.
-    // However, the Blockchain.addTransaction(transaction) expects a Transaction object
-    // that is already signed.
-    
-    // For now, let's just return an error or a placeholder if we don't have the full signing logic here.
-    res.status(501).json({ error: 'Not implemented: Transactions must be signed by the client.' });
+    const { fromAddress, toAddress, amount, signature } = req.body;
+
+    if (!fromAddress || !toAddress || !amount || !signature) {
+      return res.status(400).json({ error: 'Missing transaction details (fromAddress, toAddress, amount, signature)' });
+    }
+
+    try {
+      const tx = new Transaction(fromAddress, toAddress, amount);
+      tx.signature = signature;
+
+      this.blockchain.addTransaction(tx);
+      res.status(201).json({ message: 'Transaction added to pending transactions', transaction: tx });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
   };
 }

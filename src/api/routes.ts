@@ -1,16 +1,20 @@
 import { Router } from 'express';
 import { BlockchainController } from './blockchain.controller';
+import { WalletController } from './wallet.controller';
 import { Blockchain } from '../blockchain';
 
 export const createBlockchainRouter = (blockchain: Blockchain) => {
   const router = Router();
-  const controller = new BlockchainController(blockchain);
+  const blockchainController = new BlockchainController(blockchain);
+  const walletController = new WalletController();
 
-  router.get('/chain', controller.getChain);
-  router.get('/pending-transactions', controller.getPendingTransactions);
-  router.get('/balance/:address', controller.getBalance);
-  router.post('/mine', controller.mineTransactions);
-  router.post('/transaction', controller.addTransaction);
+  router.get('/chain', blockchainController.getChain);
+  router.get('/pending-transactions', blockchainController.getPendingTransactions);
+  router.get('/balance/:address', blockchainController.getBalance);
+  router.post('/mine', blockchainController.mineTransactions);
+  router.post('/transaction', blockchainController.addTransaction);
+  
+  router.post('/wallet/generate', walletController.generateWallet);
 
   return router;
 };
