@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "precommit": "npx tsc --noEmit && npx jest"
+    "precommit": "npx tsc --noEmit && npx jest",
+    "start:api": "ts-node src/api/server.ts"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.6.0",
+    "@types/supertest": "^7.2.0",
     "jest": "^30.3.0",
+    "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
